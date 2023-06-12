@@ -7,7 +7,10 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.harshRajpurohit.musicPlayer.databinding.ActivityFavouriteBinding
-
+/*创建一个名为FavouriteActivity的活动类，用于显示用户喜爱的音乐列表。
+它使用自动生成的绑定类将布局文件中的视图绑定到活动中的对象，
+并使用适配器来管理喜爱音乐列表的显示和操作。
+*/
 class FavouriteActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFavouriteBinding
@@ -17,7 +20,7 @@ class FavouriteActivity : AppCompatActivity() {
         var favouriteSongs: ArrayList<Music> = ArrayList()
         var favouritesChanged: Boolean = false
     }
-
+/*返回按钮的点击事件和"Shuffle"按钮的点击事件*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(MainActivity.currentTheme[MainActivity.themeIndex])

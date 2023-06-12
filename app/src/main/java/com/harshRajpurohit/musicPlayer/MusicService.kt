@@ -13,23 +13,28 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 
-class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
+/*音乐播放服务在后台运行，并负责管理音乐的播放和控制。
+* 管理音乐播放的各种功能，包括创建音乐播放器、处理音频焦点变化、更新通知栏、控制音乐的播放和暂停，以及设置音乐播放进度等功能。*/
+class MusicService: Service(), AudioManager.OnAudioFocusChangeListener { // 用于监听音频焦点的变化。
     private var myBinder = MyBinder()
     var mediaPlayer:MediaPlayer? = null
     private lateinit var mediaSession : MediaSessionCompat
     private lateinit var runnable: Runnable
     lateinit var audioManager: AudioManager
 
+    /*在绑定服务时被调用，创建了一个 MediaSessionCompat 对象，并返回 MyBinder 的实例。*/
     override fun onBind(intent: Intent?): IBinder {
         mediaSession = MediaSessionCompat(baseContext, "My Music")
         return myBinder
     }
 
+    /*用于提供服务的实例。*/
     inner class MyBinder:Binder(){
         fun currentService(): MusicService {
             return this@MusicService
         }
     }
+    /*用于显示通知栏，其中包括音乐的标题、艺术家、封面图像和控制按钮（例如播放、上一曲、下一曲）。*/
     @SuppressLint("UnspecifiedImmutableFlag")
     fun showNotification(playPauseBtn: Int){
         val intent = Intent(baseContext, MainActivity::class.java)
@@ -123,6 +128,7 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
 
         startForeground(13, notification)
     }
+    /*用于创建和准备音乐播放器（MediaPlayer）对象，并设置相关的状态和界面显示。*/
     fun createMediaPlayer(){
         try {
             if (mediaPlayer == null) mediaPlayer = MediaPlayer()
@@ -141,6 +147,7 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
         }catch (e: Exception){return}
     }
 
+    /*设置音乐播放进度条的更新。*/
     fun seekBarSetup(){
         runnable = Runnable {
             PlayerActivity.binding.tvSeekBarStart.text = formatDuration(mediaPlayer!!.currentPosition.toLong())
@@ -150,6 +157,7 @@ class MusicService: Service(), AudioManager.OnAudioFocusChangeListener {
         Handler(Looper.getMainLooper()).postDelayed(runnable, 0)
     }
 
+    /*在音频焦点发生变化时被调用，根据焦点变化的情况，暂停或播放音乐，并更新通知栏的状态。*/
     override fun onAudioFocusChange(focusChange: Int) {
         if(focusChange <= 0){
             //pause music

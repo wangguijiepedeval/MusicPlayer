@@ -20,11 +20,13 @@ import com.harshRajpurohit.musicPlayer.MusicAdapter.MyHolder
 import com.harshRajpurohit.musicPlayer.databinding.DetailsViewBinding
 import com.harshRajpurohit.musicPlayer.databinding.MoreFeaturesBinding
 import com.harshRajpurohit.musicPlayer.databinding.MusicViewBinding
-
+/*RecyclerView 适配器
+* 通过 MusicAdapter 类将音乐列表数据绑定到 RecyclerView 上，并根据不同的场景和用户交互，展示相应的视图和执行相应的操作*/
 class MusicAdapter(private val context: Context, private var musicList: ArrayList<Music>, private val playlistDetails: Boolean = false,
 private val selectionActivity: Boolean = false)
     : RecyclerView.Adapter<MyHolder>() {
 
+    /*显示音乐信息的视图元素*/
     class MyHolder(binding: MusicViewBinding) : RecyclerView.ViewHolder(binding.root) {
         val title = binding.songNameMV
         val album = binding.songAlbumMV
@@ -33,10 +35,14 @@ private val selectionActivity: Boolean = false)
         val root = binding.root
     }
 
+    /*创建新的 ViewHolder 实例时被调用，并将 MusicViewBinding 绑定到视图。*/
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyHolder {
         return MyHolder(MusicViewBinding.inflate(LayoutInflater.from(context), parent, false))
     }
 
+    /*在每个列表项要显示时被调用，用于将音乐信息绑定到 ViewHolder 中的视图元素。
+    其中包括设置音乐标题、专辑、封面图像和时长的显示，以及为列表项的点击事件设置不同的处理逻辑。
+    */
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
         holder.title.text = musicList[position].title
         holder.album.text = musicList[position].album
@@ -46,7 +52,7 @@ private val selectionActivity: Boolean = false)
             .apply(RequestOptions().placeholder(R.drawable.music_player_icon_slash_screen).centerCrop())
             .into(holder.image)
 
-        //for play next feature
+        //"播放下一个"功能
         if(!selectionActivity)
             holder.root.setOnLongClickListener {
                 val customDialog = LayoutInflater.from(context).inflate(R.layout.more_features, holder.root, false)
@@ -125,10 +131,12 @@ private val selectionActivity: Boolean = false)
          }
     }
 
+    /*返回音乐列表的大小，确定要显示的列表项数量。*/
     override fun getItemCount(): Int {
         return musicList.size
     }
 
+    /*更新列表*/
     fun updateMusicList(searchList : ArrayList<Music>){
         musicList = ArrayList()
         musicList.addAll(searchList)
@@ -150,6 +158,7 @@ private val selectionActivity: Boolean = false)
         PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.add(song)
         return true
     }
+    /*刷新播放列表*/
     fun refreshPlaylist(){
         musicList = ArrayList()
         musicList = PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist

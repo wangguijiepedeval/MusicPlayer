@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.harshRajpurohit.musicPlayer.databinding.ActivitySettingsBinding
 
+/*用于显示应用程序的设置界面和处理设置操作。用户可以选择不同的主题，查看应用程序的版本信息，并选择排序选项*/
 class SettingsActivity : AppCompatActivity() {
 
     lateinit var binding: ActivitySettingsBinding

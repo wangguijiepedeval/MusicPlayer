@@ -12,13 +12,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.GsonBuilder
 import com.harshRajpurohit.musicPlayer.databinding.ActivityPlaylistDetailsBinding
 
+/*在音乐播放器应用中实现展示播放列表详情、播放列表的基本信息显示、添加歌曲、移除全部歌曲等功能，
+并使用SharedPreferences存储音乐播放列表数据。*/
 class PlaylistDetails : AppCompatActivity() {
 
-    private lateinit var binding: ActivityPlaylistDetailsBinding
-    private lateinit var adapter: MusicAdapter
+    private lateinit var binding: ActivityPlaylistDetailsBinding //用于绑定布局文件中的视图。
+    private lateinit var adapter: MusicAdapter //用于管理播放列表中音乐的视图和数据。
 
     companion object{
-        var currentPlaylistPos: Int = -1
+        var currentPlaylistPos: Int = -1 //存储当前播放列表的位置
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,11 +44,13 @@ class PlaylistDetails : AppCompatActivity() {
             intent.putExtra("class", "PlaylistDetailsShuffle")
             startActivity(intent)
         }
+        // 添加
         binding.addBtnPD.setOnClickListener {
             startActivity(Intent(this, SelectionActivity::class.java))
         }
         binding.removeAllPD.setOnClickListener {
             val builder = MaterialAlertDialogBuilder(this)
+            // 移除
             builder.setTitle("Remove")
                 .setMessage("Do you want to remove all songs from playlist?")
                 .setPositiveButton("Yes"){ dialog, _ ->

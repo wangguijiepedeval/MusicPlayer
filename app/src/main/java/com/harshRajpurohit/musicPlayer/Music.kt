@@ -34,6 +34,11 @@ fun getImgArt(path: String): ByteArray? {
     val retriever = MediaMetadataRetriever()
     retriever.setDataSource(path)
     return retriever.embeddedPicture
+//    val resourceId = R.raw.default_music
+//    val defaultPath = "android.resource://com.example.musicPlayer/$resourceId"
+//    val retriever = MediaMetadataRetriever()
+//    retriever.setDataSource(path ?: defaultPath) // 使用Elvis运算符设置默认值
+//    return retriever.embeddedPicture
 }
 fun setSongPosition(increment: Boolean){
     if(!PlayerActivity.repeat){

@@ -15,7 +15,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.harshRajpurohit.musicPlayer.databinding.FavouriteViewBinding
 import com.harshRajpurohit.musicPlayer.databinding.MoreFeaturesBinding
-
+/*用于管理喜爱音乐列表的显示和操作。
+包含了创建视图持有者、绑定数据到视图和获取项数的方法以及用于更新喜爱音乐列表的方法。
+*/
 class FavouriteAdapter(private val context: Context, private var musicList: ArrayList<Music>,val playNext: Boolean = false) : RecyclerView.Adapter<FavouriteAdapter.MyHolder>() {
 
     class MyHolder(binding: FavouriteViewBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -36,7 +38,7 @@ class FavouriteAdapter(private val context: Context, private var musicList: Arra
             .apply(RequestOptions().placeholder(R.drawable.music_player_icon_slash_screen).centerCrop())
             .into(holder.image)
 
-        //when play next music is clicked
+        //单击“播放下一首音乐”时
         if(playNext){
             holder.root.setOnClickListener {
                 val intent = Intent(context, PlayerActivity::class.java)

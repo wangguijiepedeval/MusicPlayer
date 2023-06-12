@@ -4,7 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-
+/*在应用程序启动时创建一个重要的通知通道(CHANNEL_ID)，以确保在播放音乐时能够向用户显示相关的通知。*/
 class ApplicationClass:Application() {
     companion object{
         const val CHANNEL_ID = "channel1"

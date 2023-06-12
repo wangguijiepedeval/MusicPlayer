@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.harshRajpurohit.musicPlayer.databinding.ActivityPlayNextBinding
 
+/*用于展示下一首播放列表的视图，并处理返回按钮的点击事件。通过适配器将下一首播放列表的音乐数据显示在RecyclerView中。*/
 class PlayNext : AppCompatActivity() {
 
     companion object{

@@ -34,6 +34,7 @@ import com.harshRajpurohit.musicPlayer.databinding.AudioBoosterBinding
 class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCompletionListener {
 
 
+    /*定义了几个伴生对象属性，用于存储与音乐播放器相关的各种状态和变量。*/
     companion object {
         lateinit var musicListPA : ArrayList<Music>
         var songPosition: Int = 0
@@ -53,6 +54,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
 
 
 
+    /*覆盖了onCreate方法，用于初始化活动布局并处理各种按钮点击和交互。*/
     @SuppressLint("SetTextI18n")
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +75,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
                 .into(binding.songImgPA)
             binding.songNamePA.text = musicListPA[songPosition].title
         }
-        else initializeLayout()
+        else initializeLayout() // 调用了initializeLayout函数，根据从其他活动接收到的意图设置初始布局。
 
         //audio booster feature
         binding.boosterBtnPA.setOnClickListener {
@@ -173,7 +175,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
             FavouriteActivity.favouritesChanged = true
         }
     }
-//Important Function
+//初始化布局
     private fun initializeLayout(){
         songPosition = intent.getIntExtra("index", 0)
         when(intent.getStringExtra("class")){
@@ -200,6 +202,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
     if (musicService!= null && !isPlaying) playMusic()
     }
 
+    /*setLayout函数根据当前歌曲位置设置UI元素（例如歌曲图像、歌曲名称、重复按钮、计时器按钮等）*/
     private fun setLayout(){
         fIndex = favouriteChecker(musicListPA[songPosition].id)
         Glide.with(applicationContext)
@@ -227,6 +230,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
         window?.statusBarColor = bgColor
     }
 
+    /*负责创建一个MediaPlayer实例，用当前歌曲进行准备，并设置与播放进度相关的UI元素*/
     private fun createMediaPlayer(){
         try {
             if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
@@ -275,7 +279,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
     }
 
 
-
+/*处理与MusicService的连接。*/
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         if(musicService == null){
             val binder = service as MusicService.MyBinder
@@ -293,12 +297,13 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
         musicService = null
     }
 
+    /*在媒体播放器播放完一首歌曲并且重复功能被禁用时被调用，继续播放下一首歌曲。*/
     override fun onCompletion(mp: MediaPlayer?) {
         setSongPosition(increment = true)
         createMediaPlayer()
         setLayout()
 
-        //for refreshing now playing image & text on song completion
+        //刷新现在播放图像和文本的歌曲
         NowPlaying.binding.songNameNP.isSelected = true
         Glide.with(applicationContext)
             .load(musicListPA[songPosition].artUri)
@@ -307,6 +312,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
         NowPlaying.binding.songNameNP.text = musicListPA[songPosition].title
     }
 
+    /*处理均衡器活动的结果。*/
     @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -314,6 +320,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
             return
     }
 
+    /*显示底部对话框以设置停止音乐的计时器。*/
     private fun showBottomSheetDialog(){
         val dialog = BottomSheetDialog(this@PlayerActivity)
         dialog.setContentView(R.layout.bottom_sheet_dialog)
@@ -343,6 +350,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
             dialog.dismiss()
         }
     }
+    /*从内容URI中检索有关所选音乐的信息*/
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun getMusicDetails(contentUri: Uri): Music{
         var cursor: Cursor? = null
@@ -365,6 +373,7 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
         super.onDestroy()
         if(musicListPA[songPosition].id == "Unknown" && !isPlaying) exitApplication()
     }
+    /*初始化服务和播放列表*/
     private fun initServiceAndPlaylist(playlist: ArrayList<Music>, shuffle: Boolean, playNext: Boolean = false){
         val intent = Intent(this, MusicService::class.java)
         bindService(intent, this, BIND_AUTO_CREATE)

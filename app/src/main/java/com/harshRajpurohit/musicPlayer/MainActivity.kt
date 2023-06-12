@@ -24,12 +24,14 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.harshRajpurohit.musicPlayer.databinding.ActivityMainBinding
 import java.io.File
-
+/*实现了音乐播放器的主界面功能，包括显示音乐列表、搜索音乐、切换主题、排序音乐等操作*/
 class MainActivity : AppCompatActivity() {
+    /*声明和初始化一些变量和属性，包括布局绑定对象、导航抽屉的开关、音乐适配器等*/
     private lateinit var binding: ActivityMainBinding
     private lateinit var toggle: ActionBarDrawerToggle
     private lateinit var musicAdapter: MusicAdapter
 
+    /*伴生对象，用于存储静态变量和方法。在这里，存储了一些与主题、排序和播放列表相关的属性和常量*/
     companion object{
         lateinit var MusicListMA : ArrayList<Music>
         lateinit var musicListSearch : ArrayList<Music>
@@ -45,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         MediaStore.Audio.Media.SIZE + " DESC")
     }
 
+    /*在活动创建时调用，进行一些初始化操作*/
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,18 +56,18 @@ class MainActivity : AppCompatActivity() {
         setTheme(currentThemeNav[themeIndex])
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        //for nav drawer
+        //导航栏相关
         toggle = ActionBarDrawerToggle(this, binding.root,R.string.open, R.string.close)
         binding.root.addDrawerListener(toggle)
         toggle.syncState()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        //checking for dark theme
+        //检查是否为暗主题
         if(themeIndex == 4 &&  resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO)
             Toast.makeText(this, "Black Theme Works Best in Dark Mode!!", Toast.LENGTH_LONG).show()
 
         if(requestRuntimePermission()){
             initializeLayout()
-            //for retrieving favourites data using shared preferences
+            //用于使用共享首选项检索收藏夹数据
             FavouriteActivity.favouriteSongs = ArrayList()
             val editor = getSharedPreferences("FAVOURITES", MODE_PRIVATE)
             val jsonString = editor.getString("FavouriteSongs", null)
@@ -104,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.navAbout -> startActivity(Intent(this@MainActivity, AboutActivity::class.java))
                 R.id.navExit -> {
                     val builder = MaterialAlertDialogBuilder(this)
-                    builder.setTitle("Exit")
+                    builder.setTitle("Exit") // 退出按钮绑定
                         .setMessage("Do you want to close app?")
                         .setPositiveButton("Yes"){ _, _ ->
                             exitApplication()
@@ -121,7 +124,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
     }
-    //For requesting permission
+    //请求权限许可
     private fun requestRuntimePermission() :Boolean{
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU){
             if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -130,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
         }
-        //android 13 permission request
+        //Android 13权限请求
         else if(Build.VERSION.SDK_INT == Build.VERSION_CODES.TIRAMISU){
             if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_MEDIA_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -141,6 +144,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    /*在权限请求结果返回时调用。*/
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -154,27 +158,29 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /*当选项菜单项被选中时调用，处理对应的操作。*/
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if(toggle.onOptionsItemSelected(item))
             return true
         return super.onOptionsItemSelected(item)
     }
 
+    /*用于初始化布局和相关操作。*/
     @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("SetTextI18n")
     private fun initializeLayout(){
         search = false
         val sortEditor = getSharedPreferences("SORTING", MODE_PRIVATE)
-        sortOrder = sortEditor.getInt("sortOrder", 0)
+        sortOrder = sortEditor.getInt("sortOrder", 0) //排序
         MusicListMA = getAllAudio()
         binding.musicRV.setHasFixedSize(true)
         binding.musicRV.setItemViewCacheSize(13)
         binding.musicRV.layoutManager = LinearLayoutManager(this@MainActivity)
         musicAdapter = MusicAdapter(this@MainActivity, MusicListMA)
         binding.musicRV.adapter = musicAdapter
-        binding.totalSongs.text  = "Total Songs : "+musicAdapter.itemCount
+        binding.totalSongs.text  = "Total Songs : "+musicAdapter.itemCount // 获取歌曲总数
 
-        //for refreshing layout on swipe from top
+        //用于在从顶部滑动时刷新布局
         binding.refreshLayout.setOnRefreshListener {
             MusicListMA = getAllAudio()
             musicAdapter.updateMusicList(MusicListMA)
@@ -182,6 +188,7 @@ class MainActivity : AppCompatActivity() {
             binding.refreshLayout.isRefreshing = false
         }
     }
+    /*获取设备上的所有音频文件*/
     @SuppressLint("Recycle", "Range")
     @RequiresApi(Build.VERSION_CODES.R)
     private fun getAllAudio(): ArrayList<Music>{
@@ -205,7 +212,7 @@ class MainActivity : AppCompatActivity() {
                     val uri = Uri.parse("content://media/external/audio/albumart")
                     val artUriC = Uri.withAppendedPath(uri, albumIdC).toString()
                     val music = Music(id = idC, title = titleC, album = albumC, artist = artistC, path = pathC, duration = durationC,
-                    artUri = artUriC)
+                    artUri = artUriC) // 指音乐文件的专辑封面图像的 URI（统一资源标识符）
                     val file = File(music.path)
                     if(file.exists())
                         tempList.add(music)
@@ -216,6 +223,7 @@ class MainActivity : AppCompatActivity() {
         return tempList
     }
 
+    /*在活动销毁时调用，处理一些善后操作。*/
     override fun onDestroy() {
         super.onDestroy()
         if(!PlayerActivity.isPlaying && PlayerActivity.musicService != null){
@@ -223,17 +231,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /*在活动恢复运行时调用，用于更新数据和界面。*/
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onResume() {
         super.onResume()
-        //for storing favourites data using shared preferences
+        //用于使用共享首选项存储收藏夹数据
         val editor = getSharedPreferences("FAVOURITES", MODE_PRIVATE).edit()
         val jsonString = GsonBuilder().create().toJson(FavouriteActivity.favouriteSongs)
         editor.putString("FavouriteSongs", jsonString)
         val jsonStringPlaylist = GsonBuilder().create().toJson(PlaylistActivity.musicPlaylist)
         editor.putString("MusicPlaylist", jsonStringPlaylist)
         editor.apply()
-        //for sorting
+        //用于排序
         val sortEditor = getSharedPreferences("SORTING", MODE_PRIVATE)
         val sortValue = sortEditor.getInt("sortOrder", 0)
         if(sortOrder != sortValue){
@@ -244,9 +253,10 @@ class MainActivity : AppCompatActivity() {
         if(PlayerActivity.musicService != null) binding.nowPlaying.visibility = View.VISIBLE
     }
 
+    /*创建选项菜单，并处理搜索功能的实现。*/
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.search_view_menu, menu)
-        //for setting gradient
+
         findViewById<LinearLayout>(R.id.linearLayoutNav)?.setBackgroundResource(currentGradient[themeIndex])
         val searchView = menu?.findItem(R.id.searchView)?.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
